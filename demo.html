@@ -16,12 +16,12 @@
     <div class="ball" id="ball"></div>
     <script type="text/javascript" src="tParabola.min.js"></script>
     <script type="text/javascript">
-        var ball, p;
+        var ball = document.getElementById('ball'),
+            ball2 = document.getElementById('ball2'),
+            p = tParabola(ball, 200, -100, {autostart: false});
+
         function throwBall() {
-            ball = document.getElementById('ball');
-            ball.style.left = '200px';
-            ball.style.top = '200px';
-            p = tParabola(ball, 200, -100, {});
+            p.stop().start();
         };
     </script>
 </body>

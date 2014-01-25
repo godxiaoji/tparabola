@@ -76,7 +76,12 @@
 
     function Parabola(elem, x, y, options) {
         // 处理扩展函数
-        options = typeof options === "object" ? options : {};
+        // 不传入x,y类型处理
+        if(typeof x === "object" && x.type && x.type.nodeType === 1) {
+            options = x;
+        } else if(typeof options !== "object") {
+            options = {};
+        }
 
         // 处理起始位置top,left
         if(!elem || elem.nodeType !== 1) {
@@ -111,17 +116,18 @@
 
         // 持续时间
         this.duration = options.duration == null ? 500 : parseInt(options.duration);
-        this.begin = now();
-        this.end = this.begin + this.duration;
         
         // 默认自动抛
-        this.autostart = options.autoStart === false ? false : true;
+        this.autostart = options.autostart === false ? false : true;
 
         return this;
     }
 
     Parabola.prototype = {
         start: function() {
+            // 设置起止时间
+            this.begin = now();
+            this.end = this.begin + this.duration;
             if(this.driftX === 0 && this.driftY === 0) {
                 // 原地踏步就别浪费性能了
                 return;
@@ -147,6 +153,7 @@
             return this;
         },
         update: function(x, y) {
+            this.elem.style.position = "absolute";
             this.elem.style.left = (this.left + x) + "px";
             this.elem.style.top = (this.top + y) + "px";
             return this;
