@@ -1,9 +1,9 @@
 /**
- * parabola
+ * tParabola
  * @Author  Travis(LinYongji)
  * @Contact http://travisup.com/
- * @Version 0.0.1
- * @date    2014-01-13
+ * @Version 0.5.0
+ * @date    2014-01-25
  */
 (function() {
     // 获取当前时间
@@ -37,6 +37,12 @@
         return ret == null ? 0 : ret;
     } :
     returnFalse);
+    
+    // 转化为整数
+    function toInteger(text) {
+        text = parseInt(text);
+        return isFinite(text) ? text : 0;
+    }
 
     // 求解a b c
     function solveAbc(x, y, a) {
@@ -68,23 +74,35 @@
         return abc.a*x*x + abc.b*x + abc.c;
     }
 
-    function Parabola(elem, driftX, driftY, options) {
+    function Parabola(elem, x, y, options) {
         // 处理扩展函数
         options = typeof options === "object" ? options : {};
 
-        // 处理位置top,left
+        // 处理起始位置top,left
         if(!elem || elem.nodeType !== 1) {
             return;
         }
         this.elem = elem;
-        this.top = getCurrentCss(elem, "top");
-        this.left = getCurrentCss(elem, "left");
-        this.top = this.top? parseInt(this.top) : 0;
-        this.left = this.left? parseInt(this.left) : 0;
+        this.left = toInteger(getCurrentCss(elem, "left"));
+        this.top = toInteger(getCurrentCss(elem, "top"));
 
-        // 处理常量
-        this.driftX = driftX == null ? 0 : parseInt(driftX);
-        this.driftY = driftY == null ? 0 : parseInt(driftY);
+        // 处理位移
+        if(options.type) {
+            if(options.type == "position") {
+                // x,y指的是终点位置
+                x = toInteger(x) - this.left;
+                y = toInteger(y) - this.top;
+            } else if(options.type.nodeType === 1) {
+                // 终点元素，获取终点元素位置，忽略x,y
+                x = toInteger(getCurrentCss(options.type, "left")) - this.left;
+                y = toInteger(getCurrentCss(options.type, "top")) - this.top;
+            }
+        }
+        // 默认drift x,y指的是位移距离
+        this.driftX = toInteger(x);
+        this.driftY = toInteger(y);
+
+        // 处理公式常量
         this.curvature = options.curvature == null ? 0.001 : parseFloat(options.curvature);
         this.abc = solveAbc(this.driftX, this.driftY, this.curvature);
         
@@ -95,12 +113,19 @@
         this.duration = options.duration == null ? 500 : parseInt(options.duration);
         this.begin = now();
         this.end = this.begin + this.duration;
+        
+        // 默认自动抛
+        this.autostart = options.autoStart === false ? false : true;
 
         return this;
     }
 
     Parabola.prototype = {
         start: function() {
+            if(this.driftX === 0 && this.driftY === 0) {
+                // 原地踏步就别浪费性能了
+                return;
+            }
             timers.push(this);
             Timer.start();
             return this;
@@ -169,9 +194,9 @@
         }
     };
 
-    window.parabola = function(elem, driftX, driftY, options) {
-        var par = new Parabola(elem, driftX, driftY, options);
-        par.start();
+    window.tParabola = function(elem, x, y, options) {
+        var par = new Parabola(elem, x, y, options);
+        par.autostart && par.start();
         return par;
     };
 })();

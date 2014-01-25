@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>抛物线</title>
+    <style type="text/css">
+        body{padding: 0; margin: 0;}
+        .throw{margin: 10px 0 0 10px; cursor: pointer;}
+        .ball, .ball2{position: absolute; width: 20px; height: 20px; background-color: #000; border-radius: 10px; top: 200px; left: 200px;}
+        .ball2{left: 400px; top: 100px; background-color: #f00;}
+    </style>
+</head>
+<body>
+    <input type="button" value="抛小球" class="throw" id="throw" onclick="throwBall()">
+    <div class="ball2" id="ball2"></div>
+    <div class="ball" id="ball"></div>
+    <script type="text/javascript" src="tParabola.min.js"></script>
+    <script type="text/javascript">
+        var ball, p;
+        function throwBall() {
+            ball = document.getElementById('ball');
+            ball.style.left = '200px';
+            ball.style.top = '200px';
+            p = tParabola(ball, 200, -100, {});
+        };
+    </script>
+</body>
+</html>
