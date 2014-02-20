@@ -2,7 +2,7 @@
  * tParabola
  * @Author  Travis(LinYongji)
  * @Contact http://travisup.com/
- * @Version 0.5.0
+ * @Version 0.6.0
  * @date    2014-01-25
  */
 (function() {
@@ -79,6 +79,8 @@
         // 不传入x,y类型处理
         if(typeof x === "object" && x.type && x.type.nodeType === 1) {
             options = x;
+            x = 0;
+            y = 0;
         } else if(typeof options !== "object") {
             options = {};
         }
@@ -88,35 +90,17 @@
             return;
         }
         this.elem = elem;
-        this.left = toInteger(getCurrentCss(elem, "left"));
-        this.top = toInteger(getCurrentCss(elem, "top"));
 
-        // 处理位移
-        if(options.type) {
-            if(options.type == "position") {
-                // x,y指的是终点位置
-                x = toInteger(x) - this.left;
-                y = toInteger(y) - this.top;
-            } else if(options.type.nodeType === 1) {
-                // 终点元素，获取终点元素位置，忽略x,y
-                x = toInteger(getCurrentCss(options.type, "left")) - this.left;
-                y = toInteger(getCurrentCss(options.type, "top")) - this.top;
-            }
-        }
-        // 默认drift x,y指的是位移距离
-        this.driftX = toInteger(x);
-        this.driftY = toInteger(y);
-
-        // 处理公式常量
-        this.curvature = options.curvature == null ? 0.001 : parseFloat(options.curvature);
-        this.abc = solveAbc(this.driftX, this.driftY, this.curvature);
+        // 默认值
+        options.x = x;
+        options.y = y;
+        this.type = 'drift';
+        this.curvature = 0.001;
+        this.callback = returnFalse;
+        this.duration = 500;
         
-        // 回调
-        this.callback = typeof options.callback === "function" ? options.callback : returnFalse;
+        this.options(options);
 
-        // 持续时间
-        this.duration = options.duration == null ? 500 : parseInt(options.duration);
-        
         // 默认自动抛
         this.autostart = options.autostart === false ? false : true;
 
@@ -124,7 +108,9 @@
     }
 
     Parabola.prototype = {
-        start: function() {
+        start: function(options) {
+            // 重置属性
+            this.options(options);
             // 设置起止时间
             this.begin = now();
             this.end = this.begin + this.duration;
@@ -156,6 +142,55 @@
             this.elem.style.position = "absolute";
             this.elem.style.left = (this.left + x) + "px";
             this.elem.style.top = (this.top + y) + "px";
+            return this;
+        },
+        reset: function() {
+            this.update(0, 0);
+            return this;
+        },
+        options: function(options) {
+
+            this.left = toInteger(getCurrentCss(this.elem, "left"));
+            this.top = toInteger(getCurrentCss(this.elem, "top"));
+
+            if(typeof options !== "object") {
+                options = {};
+            }
+            
+            var x = options.x == null && typeof this.driftX === "number" ? this.driftX : options.x,
+                y = options.y == null && typeof this.driftY === "number" ? this.driftY : options.y;
+
+            if(options.type != null) {
+                this.type = options.type;
+            }
+
+            // 处理位移
+            if(this.type === "position") {
+                // x,y指的是终点位置
+                x = toInteger(x) - this.left;
+                y = toInteger(y) - this.top;
+            } else if(this.type.nodeType === 1) {
+                // 终点元素，获取终点元素位置，忽略x,y
+                x = toInteger(getCurrentCss(this.type, "left")) - this.left;
+                y = toInteger(getCurrentCss(this.type, "top")) - this.top;
+            } else {
+                x = toInteger(x);
+                y = toInteger(y);
+            }
+
+            // 默认drift x,y指的是位移距离
+            this.driftX = x;
+            this.driftY = y;
+
+            // 处理公式常量
+            this.curvature = options.curvature == null ? this.curvature : parseFloat(options.curvature);
+            this.abc = solveAbc(this.driftX, this.driftY, this.curvature);
+
+            // 回调
+            this.callback = typeof options.callback === "function" ? options.callback : this.callback;
+
+            // 持续时间
+            this.duration = options.duration == null ? this.duration : parseInt(options.duration);
             return this;
         },
         stop: function() {

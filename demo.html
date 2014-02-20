@@ -14,14 +14,14 @@
     <input type="button" value="抛小球" class="throw" id="throw" onclick="throwBall()">
     <div class="ball2" id="ball2"></div>
     <div class="ball" id="ball"></div>
-    <script type="text/javascript" src="tParabola.min.js"></script>
+    <script type="text/javascript" src="tParabola.js"></script>
     <script type="text/javascript">
         var ball = document.getElementById('ball'),
             ball2 = document.getElementById('ball2'),
             p = tParabola(ball, 200, -100, {autostart: false});
 
         function throwBall() {
-            p.stop().start();
+            p.stop().reset().start();
         };
     </script>
 </body>
