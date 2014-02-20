@@ -25,11 +25,25 @@ Javascript抛物线插件
     var p1 = tParabola(ball, 200, -100, {autostart: false});
 	var p2 = tParabola(ball, {type: ball2});
 
-##### .start()
+##### .options(options)
 
-如果`options.autostart`设置为`false`，就必须手动调用`start()`来执行抛物线操作。当然也可以重复调用。
+传入配置文件，跟初始化的`options`是一样的。
+
+##### .start([options])
+
+如果`options.autostart`设置为`false`，就必须手动调用`.start()`来执行抛物线操作。当然也可以重复调用。
+
+之后每次调用`.start()`都从结束点开始抛。
+
+可以传入配置参数`.start(options)`规划新的路线。
 
 	p.start();
+
+##### .reset()
+
+把小球重置到开始点。
+
+	p.reset();
 
 ##### .stop()
 
